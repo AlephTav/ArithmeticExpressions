@@ -83,9 +83,12 @@ class Binop implements IExpression
                 }
                 return $op1 / $op2;
             case '%':
+                if ($op2 < 1) {
+                    throw new \DivisionByZeroError('Modulo by zero.');
+                }
                 return $op1 % $op2;
             case '**':
-                return pow($op1, $op2);
+                return $op1 ** $op2;
             case '&&':
                 return $op1 && $op2;
             case '||':
