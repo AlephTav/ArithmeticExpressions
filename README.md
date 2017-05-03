@@ -26,7 +26,7 @@ Operator | Associativity | Precedence
 -(unary) +(unary) ~ | right | 8
 !        | right         | 7
 \* / %   | left          | 6
-- +      | left          | 5
+\- +     | left          | 5
 &        | left          | 4
 ^        | left          | 3
 \|       | left          | 2
