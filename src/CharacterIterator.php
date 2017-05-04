@@ -1,6 +1,8 @@
 <?php
  
-namespace ArithmeticExpressions\Utils;
+namespace ArithmeticExpressions;
+
+use ArithmeticExpressions\Interfaces\ICharacterIterator;
 
 /**
  * Use this class to iterate over all characters
@@ -9,7 +11,7 @@ namespace ArithmeticExpressions\Utils;
  * @author Sergey Milimko <smilimko@gmail.com>
  * @version 0.0.1
  */
-class CharacterIterator implements \Iterator, \Countable
+class CharacterIterator implements ICharacterIterator
 {
     /**
      * A string of characters to iterate.
@@ -62,7 +64,7 @@ class CharacterIterator implements \Iterator, \Countable
      * Constructor.
      *
      * @param string $str A string of characters to iterate.
-     * @return void
+     * @param string $newLineChar The new line character.
      */
     public function __construct(string $str, string $newLineChar = "\n")
     {

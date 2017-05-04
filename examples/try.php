@@ -2,19 +2,12 @@
 
 namespace ArithmeticExpressions;
 
-use ArithmeticExpressions\Exceptions\LexerException;
-use ArithmeticExpressions\Exceptions\ParserException;
-use ArithmeticExpressions\Exceptions\InterpreterException;
+use ArithmeticExpressions\CharacterIterator;
 use ArithmeticExpressions\Utils\ExpressionGenerator;
 
-error_reporting(E_ALL);
+require_once(__DIR__  . '/../vendor/autoload.php');
 
-// Bootstrap
-spl_autoload_register(function($class)
-{
-    $path = __DIR__ . '/../src' . substr($class, strlen('ArithmeticExpressions')) . '.php';
-    require_once($path);
-});
+error_reporting(E_ALL);
 
 $output = '';
 
@@ -29,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     // Evaluation.
     try {
         $expression = $_POST['expression'] ?? '';
-        $parser = new Parser(new Lexer($expression));
+        $parser = new Parser(new Lexer(new CharacterIterator($expression)));
         $ast = $parser->parse();
         $value = $ast->evaluate();
         $output = '<b>AST:</b> ' . $ast->toAstString() . PHP_EOL . PHP_EOL;

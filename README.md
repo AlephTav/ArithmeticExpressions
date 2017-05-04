@@ -37,7 +37,8 @@ Operator | Associativity | Precedence
 
 ```php
 $expression = '2 * (5 - 3) ** ((1 + -4) / (2 + 7))';
-$lexer = new Lexer($expression);
+$iterator = new CharacterIterator($expression);
+$lexer = new Lexer($iterator);
 $parser = new Parser($lexer);
 $ast = $parser->parse();   // $ast is an abstract syntax tree (AST) of an expression
 $value = $ast->evaluate(); // $value will contain 1.5874010519682

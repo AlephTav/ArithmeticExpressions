@@ -23,4 +23,11 @@ interface IExpression
      * @return string
      */
     public function toString() : string;
+
+    /**
+     * Returns the string representation of the AST node.
+     *
+     * @return string
+     */
+    public function toAstString() : string;
 }

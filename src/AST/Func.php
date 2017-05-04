@@ -136,7 +136,7 @@ class Func implements IExpression
      * @param int $min The minimum number of arguments.
      * @param int $max The maximum number of arguments.
      * @return void
-     * @throws \InterpreterException
+     * @throws \ArithmeticExpressions\Exceptions\InterpreterException
      */
     private function validate(array $values, int $min, int $max)
     {

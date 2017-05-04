@@ -15,7 +15,7 @@ class Factorial implements IExpression
     /**
      * The operand.
      *
-     * @var \AST\Interfaces\IExpression
+     * @var \ArithmeticExpressions\AST\Interfaces\IExpression
      */
     private $operand = null;
     

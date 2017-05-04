@@ -3,7 +3,7 @@
 namespace ArithmeticExpressions;
 
 use ArithmeticExpressions\Interfaces\ILexer;
-use ArithmeticExpressions\Utils\CharacterIterator;
+use ArithmeticExpressions\Interfaces\ICharacterIterator;
 use ArithmeticExpressions\Exceptions\LexerException;
 
 /**
@@ -36,7 +36,7 @@ class Lexer implements ILexer
     /**
      * An instance of iterator over all characters of the input string.
      *
-     * @var \CharacterIterator
+     * @var \ArithmeticExpressions\Interfaces\ICharacterIterator
      */
     private $chars = null;
     
@@ -231,6 +231,7 @@ class Lexer implements ILexer
     /**
      * Converts the token array to a string representation.
      *
+     * @param array $tokens
      * @return string
      */
     public static function toString(array $tokens) : string
@@ -245,11 +246,11 @@ class Lexer implements ILexer
     /**
      * Constructor.
      *
-     * @param string $expression The arithmetic expresssion.
+     * @param \ArithmeticExpressions\Interfaces\ICharacterIterator $charIterator
      */
-    public function __construct(string $expression)
+    public function __construct(ICharacterIterator $charIterator)
     {
-        $this->chars = new CharacterIterator($expression);
+        $this->chars = $charIterator;
     }
     
     /**
@@ -269,6 +270,7 @@ class Lexer implements ILexer
         $state = $prevState = $prevToken = 0;
         $tokenLine = $tokenColumn = 1;
         $this->chars->rewind();
+        // Iterate over all characters.
         do {
             $char = $this->chars->getNextChar();
             // Move to a new state.
@@ -367,7 +369,7 @@ class Lexer implements ILexer
      * @param string $word The token value.
      * @param int $state The state at the end of the token formation.
      * @param int $line The line number corresponds the first character of the token.
-     * @param int $column The lcolumn number corresponds the first character of the token.
+     * @param int $column The column number corresponds the first character of the token.
      * @return array 
      * @throws \ArithmeticExpressions\Exceptions\LexerException
      */

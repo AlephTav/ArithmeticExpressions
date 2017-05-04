@@ -82,6 +82,7 @@ class Parser
      * Parses the given (by lexer) token sequence of an arithmetic expresssion.
      *
      * @return \ArithmeticExpressions\AST\Interfaces\IExpression
+     * @throws \ArithmeticExpressions\Exceptions\ParserException
      */
     public function parse() : AST\Interfaces\IExpression
     {
@@ -210,6 +211,7 @@ class Parser
      * @param \SplStack $ast The AST stack.
      * @param array $token The current token. 
      * @return void
+     * @throws \ArithmeticExpressions\Exceptions\ParserException
      */
     private function pushToAST(\SplStack $ops, \SplStack $ast, array $token)
     {

@@ -138,7 +138,7 @@ class ExpressionGenerator
                 case 4: // Unexpected number.
                     $s = ' ' . mt_rand(1, 10) . ' ';
                     break;
-                default: // Unexprected comma.
+                default: // Unexpected comma.
                     $s = ',';
                     break;
             }
@@ -161,6 +161,7 @@ class ExpressionGenerator
     /**
      * Creates a random binary operation.
      *
+     * @param \ArithmeticExpressions\AST\Interfaces\IExpression $operand
      * @return \ArithmeticExpressions\AST\Binop
      */
     private function createRandomBinaryOperation(IExpression $operand) : AST\Binop
@@ -176,9 +177,8 @@ class ExpressionGenerator
     /**
      * Creates a random unary operation (including function).
      *
-     * @return \ArithmeticExpressions\AST\Unop|
-     *         \ArithmeticExpressions\AST\Factorial|
-     *         \ArithmeticExpressions\AST\Func
+     * @param \ArithmeticExpressions\AST\Interfaces\IExpression $operand
+     * @return \ArithmeticExpressions\AST\Interfaces\IExpression
      */
     private function createRandomUnaryOperation(IExpression $operand) : IExpression
     {
