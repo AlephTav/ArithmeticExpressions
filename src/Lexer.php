@@ -269,7 +269,7 @@ class Lexer implements ILexer
         $word = '';
         $state = $prevState = $prevToken = 0;
         $tokenLine = $tokenColumn = 1;
-        $this->chars->rewind();
+        $this->chars->rewindForward();
         // Iterate over all characters.
         do {
             $char = $this->chars->getNextChar();

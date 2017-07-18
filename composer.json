@@ -5,9 +5,6 @@
     "autoload": {
         "psr-4": {
             "ArithmeticExpressions\\": "src/"
-        },
-        "classmap": [
-            "tests/LexerTest.php"
-        ]
+        }
     }
 }

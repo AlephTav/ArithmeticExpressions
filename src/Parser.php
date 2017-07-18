@@ -71,7 +71,7 @@ class Parser
     /**
      * Constructor.
      *
-     * @param \ArithmeticExpressions\Interfaces\Lexer $lexer The lexer of arithmetic expresssions.
+     * @param \ArithmeticExpressions\Interfaces\ILexer $lexer The lexer of arithmetic expressions.
      */
     public function __construct(ILexer $lexer)
     {
@@ -188,8 +188,10 @@ class Parser
             }
             $prevToken = $token;
         }
-        while (false !== $this->getTopOperator($ops)) {
-            $this->pushToAST($ops, $ast, $token);
+        if (isset($token)) {
+            while (false !== $this->getTopOperator($ops)) {
+                $this->pushToAST($ops, $ast, $token);
+            }
         }
         if (!$ops->isEmpty()) {
             if ($ops->top()[0] == Lexer::T_LEFT_PARENTHESIS) {

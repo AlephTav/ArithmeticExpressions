@@ -26,6 +26,13 @@ class CharacterIterator implements ICharacterIterator
      * @var int
      */
     private $idx = -1;
+
+    /**
+     * The number of characters in the string.
+     *
+     * @var int
+     */
+    private $length = 0;
     
     /**
      * The current column.
@@ -37,7 +44,7 @@ class CharacterIterator implements ICharacterIterator
     /**
      * The current line.
      */     
-    private $line = 0;
+    private $line = 1;
     
     /**
      * The new line character.
@@ -47,11 +54,11 @@ class CharacterIterator implements ICharacterIterator
     private $newLineChar = "\n";
 
     /**
-     * The previously read char.
+     * The current character.
      *
      * @var string
      */     
-    private $prevChar = '';
+    private $char = '';
     
     /**
      * The saved states of the iterator.
@@ -69,7 +76,8 @@ class CharacterIterator implements ICharacterIterator
     public function __construct(string $str, string $newLineChar = "\n")
     {
         $this->str = $str;
-        $this->prevChar = $this->newLineChar = $newLineChar;
+        $this->length = strlen($str);
+        $this->newLineChar = $newLineChar;
     }
     
     /**
@@ -79,41 +87,89 @@ class CharacterIterator implements ICharacterIterator
      */
     public function count() : int
     {
-        return strlen($this->str);
+        return $this->length;
     }
     
     /**
-     * Returns the current line number.
+     * Returns the current line number or NULL on failure
      *
      * @return int
      */
-    public function getLine() : int
+    public function getLine()
     {
-        return $this->line;
+        return $this->isValid() ? $this->line : null;
     }
     
     /**
-     * Returns the current column number.
+     * Returns the current column number or NULL on failure.
      *
      * @return int
      */
-    public function getColumn() : int
+    public function getColumn()
     {
-        return $this->column;
+        return $this->isValid() ? $this->column : null;
     }
 
     /**
-     * Rewinds the iterator.
+     * Returns the forward iterator.
+     *
+     * @return \Generator
+     */
+    public function getIterator()
+    {
+        return $this->getForwardIterator();
+    }
+
+    /**
+     * Returns the forward iterator.
+     *
+     * @return \Generator
+     */
+    public function getForwardIterator()
+    {
+        $this->rewindForward();
+        while ('' !== $char = $this->getNextChar()) {
+            yield $this->idx => $char;
+        }
+    }
+
+    /**
+     * Returns the backward iterator.
+     *
+     * @return \Generator
+     */
+    public function getBackwardIterator()
+    {
+        $this->rewindBackward();
+        while ('' !== $char = $this->getPrevChar()) {
+            yield $this->idx => $char;
+        }
+    }
+
+    /**
+     * Prepares the iterator for forward iterations.
      *
      * @return void
      */
-    public function rewind()
+    public function rewindForward()
     {
         $this->idx = -1;
-        $this->line = 0;
+        $this->line = 1;
         $this->column = 0;
-        $this->prevChar = $this->newLineChar;
-        $this->states = [];
+        $this->char = '';
+    }
+
+    /**
+     * Prepares the iterator for backward iterations.
+     *
+     * @return void
+     */
+    public function rewindBackward()
+    {
+        $this->idx = $this->length;
+        $this->line = substr_count($this->str, $this->newLineChar) + 1;
+        $this->column = $this->getColumnNumber($this->idx - ($this->str[$this->idx - 1] === $this->newLineChar));
+        $this->char = '';
     }
 
     /**
@@ -121,29 +177,19 @@ class CharacterIterator implements ICharacterIterator
      *
      * @return string
      */
-    public function current()
+    public function getChar() : string
     {
-        return $this->str[$this->idx] ?? '';
+        return $this->char;
     }
 
     /**
-     * Returns the position of the current character.
+     * Returns the position of the current character or NULL on failure.
      *
      * @return int
      */
-    public function key()
+    public function getIndex()
     {
-        return $this->idx;
-    }
-
-    /**
-     * Moves the internal pointer to the next character.
-     *
-     * @return void
-     */
-    public function next()
-    {
-        ++$this->idx;
+        return $this->isValid() ? $this->idx : null;
     }
 
     /**
@@ -152,50 +198,66 @@ class CharacterIterator implements ICharacterIterator
      *
      * @return bool
      */
-    public function valid()
+    public function isValid() : bool
     {
-        return isset($this->str[$this->idx]);
+        return $this->idx >= 0 && $this->idx < $this->length;
     }
-    
+
     /**
-     * Returns the next character or empty string on failure.
+     * Advances the internal pointer to the next character and return it
+     * (or empty string on failure).
      *
      * @return string
      */
     public function getNextChar() : string
     {
-        ++$this->idx;
-        if ($this->valid()) {
-            if ($this->prevChar === $this->newLineChar) {
-                $this->column = 1;
-                ++$this->line;
+        if ($this->idx < $this->length) {
+            ++$this->idx;
+            if ($this->idx < $this->length) {
+                if ($this->char === $this->newLineChar) {
+                    $this->column = 1;
+                    ++$this->line;
+                } else {
+                    ++$this->column;
+                }
+                $this->char = $this->str[$this->idx];
             } else {
-                ++$this->column;
+                if ($this->char === $this->newLineChar) {
+                    ++$this->line;
+                } else {
+                    ++$this->column;
+                }
+                $this->char = '';
             }
-            return $this->prevChar = $this->str[$this->idx];
         }
-        return '';
+        return $this->char;
     }
-    
+
     /**
-     * Returns the previous character or empty string on failure.
+     * Moves the internal pointer to the previous character and return it
+     * (or empty string on failure).
      *
      * @return string
      */
     public function getPrevChar() : string
     {
-        --$this->idx;
-        if ($this->valid()) {
-            $this->prevChar = $this->str[$this->idx];
-            if ($this->prevChar === $this->newLineChar) {
-                $this->column = $this->idx - (int)strrpos($this->str, $this->newLineChar, -$this->idx);
-                --$this->line;
+        if ($this->idx >= 0) {
+            --$this->idx;
+            if ($this->idx >= 0) {
+                $this->char = $this->str[$this->idx];
+                if ($this->char === $this->newLineChar) {
+                    --$this->line;
+                    $this->column = $this->getColumnNumber($this->idx);
+                } else {
+                    --$this->column;
+                }
+                return $this->char;
             } else {
-                --$this->column;
+                $this->char = '';
+                $this->column = 0;
             }
-            return $this->prevChar;
         }
-        return '';
+        return $this->char;
     }
     
     /**
@@ -210,7 +272,7 @@ class CharacterIterator implements ICharacterIterator
             $this->idx,
             $this->line,
             $this->column,
-            $this->prevChar
+            $this->char
         ];
     }
     
@@ -218,13 +280,41 @@ class CharacterIterator implements ICharacterIterator
      * Restores the previously saved state of the iterator.
      *
      * @param string $key The state name.
+     * @param bool $removeState Determines whether to remove the stored state.
+     * @return void
+     * @throws \UnexpectedValueException
+     */
+    public function restore(string $key, $removeState = true)
+    {
+        if (isset($this->states[$key])) {
+            list($this->idx, $this->line, $this->column, $this->char) = $this->states[$key];
+            if ($removeState) {
+                unset($this->states[$key]);
+            }
+        } else {
+            throw new \UnexpectedValueException('The state with the given key does not exist.');
+        }
+    }
+
+    /**
+     * Clear all stored states.
+     *
      * @return void
      */
-    public function restore(string $key)
+    public function clear()
     {
-        if ($this->states[$key]) {
-            list($this->idx, $this->line, $this->column, $this->prevChar) = $this->states[$key];
-            unset($this->states[$key]);
-        }
+        $this->states = [];
+    }
+
+    /**
+     * Returns the column number by the character's index.
+     *
+     * @param int $idx
+     * @return int
+     */
+    private function getColumnNumber(int $idx) : int
+    {
+        $pos = strrpos(substr($this->str, 0, $idx), $this->newLineChar);
+        return $idx - ($pos === false ? -1 : $pos);
     }
 }
