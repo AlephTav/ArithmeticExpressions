@@ -14,6 +14,14 @@ use ArithmeticExpressions\Exceptions\InterpreterException;
 class Func implements IExpression
 {
     /**
+     * The error message templates.
+     */
+    const ERR_FUNC_1 = 'Log base must be greater than 0.';
+    const ERR_FUNC_2 = 'Insufficient function arguments.';
+    const ERR_FUNC_3 = 'Too many arguments.';
+    const ERR_FUNC_4 = 'Unknown function "%s".';
+
+    /**
      * The function name.
      *
      * @var string
@@ -68,8 +76,8 @@ class Func implements IExpression
         switch ($this->func) {
             case 'log':
                 $this->validate($values, 2, 2);
-                if ($values[1] < 0) {
-                    throw new \InvalidArgumentException('Log base must be greater than 0.');
+                if ($values[1] <= 0) {
+                    throw new InterpreterException(self::ERR_FUNC_1);
                 }
                 return log($values[0], $values[1]);
             case 'lg':
@@ -94,7 +102,7 @@ class Func implements IExpression
                 $this->validate($values, 0, 0);
                 return mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax();
         }
-        throw new InterpreterException('Unknown function "' . $this->func . '".');
+        throw new InterpreterException(sprintf(self::ERR_FUNC_4, $this->func));
     }
     
     /**
@@ -142,10 +150,10 @@ class Func implements IExpression
     {
         $count = count($values);
         if ($count < $min) {
-            throw new InterpreterException('Insufficient function arguments.');
+            throw new InterpreterException(self::ERR_FUNC_2);
         }
         if ($count > $max) {
-            throw new InterpreterException('Too many arguments.');
+            throw new InterpreterException(self::ERR_FUNC_3);
         }
     }
 }

@@ -3,8 +3,8 @@
 use PHPUnit\Framework\TestCase;
 use ArithmeticExpressions\Exceptions\ParserException;
 use ArithmeticExpressions\CharacterIterator;
-use ArithmeticExpressions\Parser;
 use ArithmeticExpressions\Lexer;
+use ArithmeticExpressions\Parser;
 
 /**
  * Test cases for \ArithmeticExpressions\Parser class.

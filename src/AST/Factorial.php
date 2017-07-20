@@ -3,6 +3,7 @@
 namespace ArithmeticExpressions\AST;
 
 use ArithmeticExpressions\AST\Interfaces\IExpression;
+use ArithmeticExpressions\Exceptions\InterpreterException;
 
 /**
  * The implementation of the factorial operation.
@@ -11,7 +12,14 @@ use ArithmeticExpressions\AST\Interfaces\IExpression;
  * @version 0.0.1
  */
 class Factorial implements IExpression
-{    
+{
+    /**
+     * The error message templates.
+     */
+    const ERR_FACTORIAL_1 = 'The factorial operand must be non-negative.';
+    const ERR_FACTORIAL_2 = 'The factorial operand must be less than 171.';
+    const ERR_FACTORIAL_3 = 'The factorial operand must be integer.';
+
     /**
      * The operand.
      *
@@ -30,23 +38,24 @@ class Factorial implements IExpression
     }
     
     /**
-     * Evaluates the binary operation.
+     * Evaluates the factorial.
      *
-     * @return mixed
-     * @throws \InvalidArgumentException
+     * @return int
+     * @throws \ArithmeticExpressions\Exceptions\InterpreterException
      */
     public function evaluate()
     {
         $op = (float)$this->operand->evaluate();
         if ($op < 0) {
-            throw new \InvalidArgumentException('The factorial operand must be non-negative.');
+            throw new InterpreterException(self::ERR_FACTORIAL_1);
         }
         if ($op > 170) {
-            throw new \InvalidArgumentException('The factorial operand must be less than 171.');
+            throw new InterpreterException(self::ERR_FACTORIAL_2);
         }
         if ($op != floor($op)) {
-            throw new \InvalidArgumentException('The factorial operand must be integer.');
+            throw new InterpreterException(self::ERR_FACTORIAL_3);
         }
+        $op = (int)$op;
         $value = 1;
         while ($op >= 2) {
             $value *= $op;

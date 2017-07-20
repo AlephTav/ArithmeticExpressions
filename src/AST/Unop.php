@@ -15,6 +15,11 @@ use ArithmeticExpressions\Exceptions\InterpreterException;
 class Unop implements IExpression
 {
     /**
+     * The error message templates.
+     */
+    const ERR_UNOP_1 = 'Unknown unary operator "%s".';
+
+    /**
      * The binary operator.
      *
      * @var string
@@ -69,7 +74,7 @@ class Unop implements IExpression
             case '~':
                 return ~(float)$op;
         }
-        throw new InterpreterException('Unknown unary operator "' . $this->operator . '".');
+        throw new InterpreterException(sprintf(self::ERR_UNOP_1, $this->operator));
     }
     
     /**

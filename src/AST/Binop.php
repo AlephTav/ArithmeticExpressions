@@ -15,6 +15,13 @@ use ArithmeticExpressions\Exceptions\InterpreterException;
 class Binop implements IExpression
 {
     /**
+     * The error message templates.
+     */
+    const ERR_BINOP_1 = 'Division by zero.';
+    const ERR_BINOP_2 = 'Modulo by zero.';
+    const ERR_BINOP_3 = 'Unknown binary operator "%s".';
+
+    /**
      * The binary operator.
      *
      * @var string
@@ -79,12 +86,12 @@ class Binop implements IExpression
                 return $op1 * $op2;
             case '/':
                 if ($op2 == 0) {
-                    throw new \DivisionByZeroError('Division by zero.');
+                    throw new InterpreterException(self::ERR_BINOP_1);
                 }
                 return $op1 / $op2;
             case '%':
                 if ($op2 < 1) {
-                    throw new \DivisionByZeroError('Modulo by zero.');
+                    throw new InterpreterException(self::ERR_BINOP_2);
                 }
                 return $op1 % $op2;
             case '**':
@@ -100,7 +107,7 @@ class Binop implements IExpression
             case '^':
                 return $op1 ^ $op2;
         }
-        throw new InterpreterException('Unknown binary operator "' . $this->operator . '".');
+        throw new InterpreterException(sprintf(self::ERR_BINOP_3, $this->operator));
     }
     
     /**
